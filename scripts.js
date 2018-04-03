@@ -12,7 +12,7 @@ const LONG_BREAK_SESSION_TIME = 20
 
 
 
-let timerSession = 6
+let timerSession = 1
 let notificationsAllowed = true 
 let isTimerRunning = false
 let hasSessionEnd = true
@@ -81,15 +81,15 @@ function changeTimerMode(){
 
     if(isTimeForLongBreak()){
         
-        timerTime = new Time(0,LONG_BREAK_SESSION_TIME)
+        timerTime = new Time(LONG_BREAK_SESSION_TIME,0)
         changeButton(LONG_BREAK_SESSION_COLOR,timerTime.toString())
     }else if(isTimeForBreak()){
         
-        timerTime = new Time(0,SHORT_BREAK_SESSION_TIME)
+        timerTime = new Time(SHORT_BREAK_SESSION_TIME,0)
         changeButton(SHORT_BREAK_SESSION_COLOR,timerTime.toString())
     }else{
 
-        timerTime = new Time(0,WORK_SESSION_TIME)
+        timerTime = new Time(WORK_SESSION_TIME,0)
         changeButton(WORK_SESSION_COLOR,timerTime.toString())
     }
 
