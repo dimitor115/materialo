@@ -12,7 +12,7 @@ const LONG_BREAK_SESSION_TIME = 20
 
 
 
-let timerSession = 1
+let timerSession = 6
 let notificationsAllowed = true 
 let isTimerRunning = false
 let hasSessionEnd = true
@@ -48,25 +48,15 @@ window.onload = () =>  {
 }
 
 
-function timerInitializer(restart){
-    console.log(restart)
+function timerInitializer(){
+    
     let prepareStart = () =>{
         const button = document.getElementById("start")
-        button.style = 'color :#ffffff;'
+        button.style.color = '#ffffff'
         
         timerSession++
     }
 
-    if(restart){
-
-        isTimerRunning = false
-        changeTimerMode()
-        prepareStart()
-        isTimerRunning = true
-        startTimer(currentTimerTime)
-
-    }
-    else{
 
         if(isTimerRunning)
             isTimerRunning = false
@@ -79,23 +69,15 @@ function timerInitializer(restart){
             startTimer(currentTimerTime)
             isTimerRunning = true
         }
-    }
-    console.log(timerSession)
 
-    // if(!isTimerRunning){ // 3 po 25, 1 po 20 przerwy
-    //     let timerTime = currentTimerTime //nie jest to najlepszy pomysł ale eh ;c
-        
-        
-
-    // }else{
-    //     isTimerRunning = false
-    // }
 }
 
 function changeTimerMode(){
 
     const button = document.getElementById("start")
     let timerTime = null
+
+    console.log(timerSession)
 
     if(isTimeForLongBreak()){
         
@@ -111,7 +93,7 @@ function changeTimerMode(){
         changeButton(WORK_SESSION_COLOR,timerTime.toString())
     }
 
-    button.style = 'color :#c0bcbc;'
+    button.style.color = '#c0bcbc'
 
     currentTimerTime = timerTime
 
@@ -121,7 +103,7 @@ function changeTimerMode(){
 
 function changeButton(color,sessionTime){
     const button = document.getElementById("start")
-    button.style = 'background-color :' + color
+    button.style.backgroundColor = color
     button.innerHTML = sessionTime
 }
 
