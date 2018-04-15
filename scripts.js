@@ -10,8 +10,6 @@ const LONG_BREAK_SESSION_COLOR = 'rgb(47, 166, 212)'
 const LONG_BREAK_SESSION_TIME = 20
 
 
-
-
 let timerSession = 1
 let notificationsAllowed = true 
 let isTimerRunning = false
@@ -112,17 +110,21 @@ function startTimer(time){
     button.innerHTML = time.toString()
     
     let i=0
+    let lastTime = Date.now()
     const interval = setInterval(()=>{
-        
-        if(i==10)
-        {
-            time.cutOneSecond()
 
+        let currentTime = Date.now()
+
+        if(lastTime + 1000 <= currentTime){
+
+            const n = Math.floor((currentTime - lastTime)/1000)
+            console.log(n)
+            time.cutSeconds(n)
             const timeString = time.toString()
             document.title = timeString
             button.innerHTML = timeString
 
-            i=0
+            lastTime = Date.now()
 
             if(time.isZero())
             {
@@ -131,7 +133,24 @@ function startTimer(time){
             }
         }
         
-        i++
+        // if(i==10)
+        // {
+        //     time.cutOneSecond()
+
+        //     const timeString = time.toString()
+        //     document.title = timeString
+        //     button.innerHTML = timeString
+
+        //     i=0
+
+        //     if(time.isZero())
+        //     {
+        //         endSession()
+        //         endTimer(interval)
+        //     }
+        // }
+        
+        // i++
 
         if(!isTimerRunning)
             endTimer(interval)
@@ -181,6 +200,10 @@ class Time {
         const secondsString = seconds>9 ? `${seconds}` : `0${seconds}`
         
         return `${minutesString}:${secondsString}`
+    }
+
+    cutSeconds(n){
+        this.seconds-=n
     }
 
     cutOneSecond(){
