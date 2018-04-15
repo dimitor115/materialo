@@ -9,7 +9,7 @@ const SHORT_BREAK_SESSION_TIME = 5
 const LONG_BREAK_SESSION_COLOR = 'rgb(47, 166, 212)'
 const LONG_BREAK_SESSION_TIME = 20
 
-
+const TIMER_MODES = {WORK_SESSION:0,SHORT_BREAK_SESSION:1,LONG_BREAK_SESSION:2}
 
 
 let timerSession = 1
@@ -57,9 +57,8 @@ function timerInitializer(){
         timerSession++
     }
 
-
         if(isTimerRunning)
-            isTimerRunning = false
+            isTimerRunning = false //stop timer
         else{
 
             if(hasSessionEnd){
@@ -81,15 +80,15 @@ function changeTimerMode(){
 
     if(isTimeForLongBreak()){
         
-        timerTime = new Time(LONG_BREAK_SESSION_TIME,0)
+        timerTime = new Time(0,LONG_BREAK_SESSION_TIME)
         changeButton(LONG_BREAK_SESSION_COLOR,timerTime.toString())
     }else if(isTimeForBreak()){
         
-        timerTime = new Time(SHORT_BREAK_SESSION_TIME,0)
+        timerTime = new Time(0,SHORT_BREAK_SESSION_TIME)
         changeButton(SHORT_BREAK_SESSION_COLOR,timerTime.toString())
     }else{
 
-        timerTime = new Time(WORK_SESSION_TIME,0)
+        timerTime = new Time(0,WORK_SESSION_TIME)
         changeButton(WORK_SESSION_COLOR,timerTime.toString())
     }
 
@@ -97,6 +96,21 @@ function changeTimerMode(){
 
     currentTimerTime = timerTime
 
+}
+
+function forceModeChange(mode){
+    isTimerRunning = false 
+
+    if(mode==TIMER_MODES.WORK_SESSION){
+        timerSession = 1
+    }else if(mode == TIMER_MODES.SHORT_BREAK_SESSION){
+        timerSession = 2
+    }else if(mode = TIMER_MODES.LONG_BREAK_SESSION){
+        timerSession = 6
+    }
+
+    changeTimerMode()
+    //timerSession++
 }
 
 
@@ -190,7 +204,7 @@ class Time {
 
     isZero (){ 
 
-        return this.seconds == 0  
+        return this.seconds <= 0  
     } 
 }
 
