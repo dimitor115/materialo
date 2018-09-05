@@ -9,18 +9,20 @@ const SHORT_BREAK_SESSION_TIME = 5
 const LONG_BREAK_SESSION_COLOR = 'rgb(47, 166, 212)'
 const LONG_BREAK_SESSION_TIME = 20
 
+const TIMER_MODES = { WORK_SESSION: 0, SHORT_BREAK_SESSION: 1, LONG_BREAK_SESSION: 2 }
+
 
 let timerSession = 1
-let notificationsAllowed = true 
+let notificationsAllowed = true
 let isTimerRunning = false
 let hasSessionEnd = true
 let currentTimerTime = null
 
-let isTimeForBreak = () => timerSession%2==0 
-let isTimeForLongBreak =() => timerSession % 6 ==0 //jak 3 i długa przerwa to 6 a nie 4 to 8
+let isTimeForBreak = () => timerSession % 2 == 0
+let isTimeForLongBreak = () => timerSession % 6 == 0 //jak 3 i długa przerwa to 6 a nie 4 to 8
 
 
-window.onload = () =>  {
+window.onload = () => {
 
     changeTimerMode()
 
@@ -31,64 +33,62 @@ window.onload = () =>  {
 
     } else if (Notification.permission !== "denied") {
 
-        Notification.requestPermission( (permission) => {
-          
-            if (permission === "granted") 
+        Notification.requestPermission((permission) => {
+
+            if (permission === "granted")
                 console.log('now we can serve you notifications')
-            else if (permission === "denied")
-            {
+            else if (permission === "denied") {
                 console.log(`we can't serve you notifications without your permission `)
                 notificationsAllowed = false
             }
 
         })
-      }
+    }
 }
 
 
-function timerInitializer(){
-    
-    let prepareStart = () =>{
+function timerInitializer() {
+
+    let prepareStart = () => {
         const button = document.getElementById("start")
         button.style.color = '#ffffff'
-        
+
         timerSession++
     }
 
+    if (isTimerRunning)
+        isTimerRunning = false //stop timer
+    else {
 
-        if(isTimerRunning)
-            isTimerRunning = false
-        else{
-
-            if(hasSessionEnd){
-                prepareStart()
-                hasSessionEnd = false
-            }
-            startTimer(currentTimerTime)
-            isTimerRunning = true
+        if (hasSessionEnd) {
+            prepareStart()
+            hasSessionEnd = false
         }
+        startTimer(currentTimerTime)
+        isTimerRunning = true
+    }
 
 }
 
-function changeTimerMode(){
+function changeTimerMode() {
 
     const button = document.getElementById("start")
     let timerTime = null
 
     console.log(timerSession)
 
-    if(isTimeForLongBreak()){
-        
-        timerTime = new Time(LONG_BREAK_SESSION_TIME,0)
-        changeButton(LONG_BREAK_SESSION_COLOR,timerTime.toString())
-    }else if(isTimeForBreak()){
-        
-        timerTime = new Time(SHORT_BREAK_SESSION_TIME,0)
-        changeButton(SHORT_BREAK_SESSION_COLOR,timerTime.toString())
-    }else{
+    if (isTimeForLongBreak()) {
 
-        timerTime = new Time(WORK_SESSION_TIME,0)
-        changeButton(WORK_SESSION_COLOR,timerTime.toString())
+        timerTime = new Time(LONG_BREAK_SESSION_TIME, 0)
+        changeButton(LONG_BREAK_SESSION_COLOR, timerTime.toString())
+    } else if (isTimeForBreak()) {
+
+        timerTime = new Time(SHORT_BREAK_SESSION_TIME, 0)
+        changeButton(SHORT_BREAK_SESSION_COLOR, timerTime.toString())
+    } else {
+
+        timerTime = new Time(WORK_SESSION_TIME, 0)
+        changeButton(WORK_SESSION_COLOR, timerTime.toString())
     }
 
     button.style.color = '#c0bcbc'
@@ -97,27 +97,42 @@ function changeTimerMode(){
 
 }
 
+function forceModeChange(mode) {
+    isTimerRunning = false
+
+    if (mode == TIMER_MODES.WORK_SESSION) {
+        timerSession = 1
+    } else if (mode == TIMER_MODES.SHORT_BREAK_SESSION) {
+        timerSession = 2
+    } else if (mode = TIMER_MODES.LONG_BREAK_SESSION) {
+        timerSession = 6
+    }
+
+    changeTimerMode()
+    //timerSession++
+}
 
 
-function changeButton(color,sessionTime){
+
+function changeButton(color, sessionTime) {
     const button = document.getElementById("start")
     button.style.backgroundColor = color
     button.innerHTML = sessionTime
 }
 
-function startTimer(time){
+function startTimer(time) {
     const button = document.getElementById("start")
     button.innerHTML = time.toString()
-    
-    let i=0
+
+    let i = 0
     let lastTime = Date.now()
-    const interval = setInterval(()=>{
+    const interval = setInterval(() => {
 
         let currentTime = Date.now()
 
-        if(lastTime + 1000 <= currentTime){
+        if (lastTime + 1000 <= currentTime) {
 
-            const n = Math.floor((currentTime - lastTime)/1000)
+            const n = Math.floor((currentTime - lastTime) / 1000)
             console.log(n)
             time.cutSeconds(n)
             const timeString = time.toString()
@@ -126,13 +141,12 @@ function startTimer(time){
 
             lastTime = Date.now()
 
-            if(time.isZero())
-            {
+            if (time.isZero()) {
                 endSession()
                 endTimer(interval)
             }
         }
-        
+
         // if(i==10)
         // {
         //     time.cutOneSecond()
@@ -149,22 +163,22 @@ function startTimer(time){
         //         endTimer(interval)
         //     }
         // }
-        
+
         // i++
 
-        if(!isTimerRunning)
+        if (!isTimerRunning)
             endTimer(interval)
 
-    },100)
+    }, 100)
 }
 
-function endSession(){
+function endSession() {
     createNotification()
     changeTimerMode()
     hasSessionEnd = true
 }
 
-function endTimer(interval){
+function endTimer(interval) {
 
     clearInterval(interval)
     isTimerRunning = false
@@ -180,41 +194,41 @@ function createNotification() {
         icon: 'logo.png',
     }
     const notification = new Notification("MATERIALO", options);
-    
-  }
+
+}
 
 
 class Time {
-    constructor(minutes,seconds){
-        
+    constructor(minutes, seconds) {
+
         this.seconds = seconds
         //convert minuses to seconds
-        this.seconds += minutes*60
+        this.seconds += minutes * 60
     }
 
-    toString(){
+    toString() {
         const minutes = Math.floor(this.seconds / 60)
         const seconds = this.seconds % 60
 
-        const minutesString = minutes>9 ? `${minutes}` : `0${minutes}`
-        const secondsString = seconds>9 ? `${seconds}` : `0${seconds}`
-        
+        const minutesString = minutes > 9 ? `${minutes}` : `0${minutes}`
+        const secondsString = seconds > 9 ? `${seconds}` : `0${seconds}`
+
         return `${minutesString}:${secondsString}`
     }
 
-    cutSeconds(n){
-        this.seconds-=n
+    cutSeconds(n) {
+        this.seconds -= n
     }
 
-    cutOneSecond(){
+    cutOneSecond() {
 
         this.seconds--
     }
 
-    isZero (){ 
+    isZero() {
 
-        return this.seconds == 0  
-    } 
+        return this.seconds <= 0
+    }
 }
 
 
